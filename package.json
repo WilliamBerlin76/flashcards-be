@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Lambda-School-Labs/flashcards-be#readme",
   "dependencies": {
+    "@firebase/testing": "^0.16.3",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "firebase-admin": "^8.8.0",

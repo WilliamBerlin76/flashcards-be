@@ -1,10 +1,9 @@
-const db = require('../config/firestore-config');
+const admin = require('../config/firestore-config');
 
 module.exports = {
-    getAllCards
+  getAllCards
 };
 
-function getAllCards(){
-    return db.collection('DemoDeck')
-            .get()
-};
+function getAllCards() {
+  return admin.db.collection('DemoDeck').get();
+}

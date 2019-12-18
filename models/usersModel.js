@@ -1,7 +1,8 @@
 const admin = require('../config/firestore-config');
 
 module.exports = {
-  addProfile
+  addProfile,
+  getUser
 };
 
 function addProfile(id, details) {
@@ -9,4 +10,11 @@ function addProfile(id, details) {
     .collection('Users')
     .doc(id)
     .set(details);
+}
+
+function getUser(id) {
+  return admin.db
+    .collection('Users')
+    .doc(id)
+    .get();
 }
