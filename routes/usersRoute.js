@@ -1,4 +1,5 @@
 const Users = require('../models/usersModel');
+const verifyUser = require('../middleware/verifyUserId');
 
 const router = require('express').Router();
 
@@ -49,7 +50,7 @@ router.get('/:id', (req, res) => {
 });
 
 /////// Update a User /////////
-router.put('/:id', (req, res) => {
+router.put('/:id', verifyUser.verifyUserId, (req, res) => {
   const { id } = req.params;
   const { changes } = req.body;
 
