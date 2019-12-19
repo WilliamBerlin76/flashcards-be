@@ -21,6 +21,34 @@ router.get('/', (req, res) => {
     });
 });
 
+/**
+ * @swagger
+ *
+ * /api/demo/:id:
+ *   get:
+ *     description: Get all decks associated with an id
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: id
+ *         description: User Id
+ *         in: params
+ *         required: true
+ *         type: string
+ *     responses:
+ *       '200':
+ *         description: Array of Deck Names
+ *       '404': 
+ *          description: collection not found
+ *          schema: 
+ *            type: object
+ *            properties: 
+ *              error: 
+ *                type: string
+ *                description: error message
+ *        
+ */
+
 router.get('/:id', (req, res) => {
   const { id } = req.params;
 
@@ -40,6 +68,39 @@ router.get('/:id', (req, res) => {
       });
     });
 });
+
+/**
+ * @swagger
+ *
+ * /api/demo/:id/:colId :
+ *   get:
+ *     description: Get all decks associated with an id
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: id
+ *         description: User Id
+ *         in: params
+ *         required: true
+ *         type: string
+ *       - name: colId
+ *         description: Collection Id
+ *         in: params
+ *         required: true
+ *         type: string
+ *     responses:
+ *       '200':
+ *         description: Receive an Object with the deckname and data array containing each card as an object
+ *       '404': 
+ *          description: collection not found
+ *          schema: 
+ *            type: object
+ *            properties: 
+ *              error: 
+ *                type: string
+ *                description: error message
+ *        
+ */
 
 router.get('/:id/:colId', verifyDeck.verifyDeckId, (req, res) => {
   const { id, colId } = req.params;

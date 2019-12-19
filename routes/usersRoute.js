@@ -23,6 +23,43 @@ router.post('/', (req, res) => {
     });
 });
 
+/**
+ * @swagger
+ *
+ * /api/users/:id:
+ *   get:
+ *     description: Get a User's profile by their User Id
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: id
+ *         description: User Id
+ *         in: params
+ *         required: true
+ *         type: string
+ *     responses:
+ *       '200':
+ *         description: Returns a User's Profile as an object
+ *         schema:
+ *            type: object
+ *            properties:
+ *              id:
+ *                type: string
+ *                description: User Id
+ *              data:
+ *                type: object
+ *                description: User's Profile Settings
+ *       '404': 
+ *          description: User not found
+ *          schema: 
+ *            type: object
+ *            properties: 
+ *              error: 
+ *                type: string
+ *                description: error message
+ *        
+ */
+
 ////////// Get a User ///////////
 router.get('/:id', (req, res) => {
   const { id } = req.params;
@@ -48,6 +85,48 @@ router.get('/:id', (req, res) => {
     })
     .catch(err => console.log(err));
 });
+
+/**
+ * @swagger
+ *
+ * /api/users/:id:
+ *   put:
+ *     description: Update a User's profile by their User Id
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: id
+ *         description: User Id
+ *         in: params
+ *         required: true
+ *         type: string
+ *       - name: changes
+ *         description: Updates to be made to the User's profile
+ *         in: body
+ *         required: true
+ *         type: object
+ *     responses:
+ *       '200':
+ *         description: A User's profile was successfully updated
+ *         schema:
+ *            type: object
+ *            properties:
+ *              id:
+ *                type: string
+ *                description: User Id
+ *              data:
+ *                type: object
+ *                description: User's Profile Settings
+ *       '404': 
+ *          description: User not found
+ *          schema: 
+ *            type: object
+ *            properties: 
+ *              error: 
+ *                type: string
+ *                description: error message
+ *        
+ */
 
 /////// Update a User /////////
 router.put('/:id', verifyUser.verifyUserId, (req, res) => {
