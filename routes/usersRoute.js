@@ -48,4 +48,24 @@ router.get('/:id', (req, res) => {
     .catch(err => console.log(err));
 });
 
+/////// Update a User /////////
+router.put('/:id', (req, res) => {
+  const { id } = req.params;
+  const { changes } = req.body;
+
+  Users.updateUser(id, changes)
+    .then(seconds => {
+      Users.getUser(id).then(user => {
+        const retUser = {
+          id: user.id,
+          data: user.data()
+        };
+        res.status(200).json(retUser);
+      });
+    })
+    .catch(err => {
+      res.status(500).json({ error: 'There was an error updating the user' });
+    });
+});
+
 module.exports = router;
