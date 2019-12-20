@@ -5,24 +5,24 @@ const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
 const swaggerOptions = {
-    swaggerDefinition: {
-        info: {
-            title: 'mNeme API',
-            description: 'API for mNeme Flashcards and Users',
-            contact: {
-                name: 'mNeme'
-            },
-            servers: ['http://localhost:5000']
-        }
-    },
-    apis: ['./routes/*.js']
+  swaggerDefinition: {
+    info: {
+      title: 'mNeme API',
+      description: 'API for mNeme Flashcards and Users',
+      contact: {
+        name: 'mNeme'
+      },
+      servers: ['http://localhost:5000', 'https://flashcards-be.herokuapp.com/']
+    }
+  },
+  apis: ['./routes/*.js']
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 server.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 const globalMiddleware = require('../config/middlewareConfig');
-globalMiddleware(server)
+globalMiddleware(server);
 
 const apiRouter = require('./api-router');
 
@@ -39,7 +39,7 @@ server.use('/api', apiRouter);
  */
 
 server.get('/', (req, res) => {
-    res.send('welcome to the flashcards backend')
+  res.send('welcome to the flashcards backend');
 });
 
 module.exports = server;
