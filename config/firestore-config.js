@@ -1,5 +1,5 @@
 const admin = require('firebase-admin');
-const serviceAccount = require('../ServiceAccountKey.json')
+const serviceAccount = require('../ServiceAccountKey.json');
 
 if(!serviceAccount){
   admin.initializeApp({
@@ -21,7 +21,7 @@ if(!serviceAccount){
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
   });
-}
+};
 
 
 function verifyUser(req, res, next) {
@@ -33,7 +33,7 @@ function verifyUser(req, res, next) {
       next();
     })
     .catch(err => res.status(401).json({ error: 'You are not logged in!' }));
-}
+};
 
 let db = admin.firestore();
 
