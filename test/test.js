@@ -1,4 +1,5 @@
 const firebase = require("@firebase/testing");
+const assert = require('assert');
 const fs = require("fs");
 const { getAllDecks, getListOfDecks } = require('../models/demoDeckModel');
 
@@ -20,5 +21,12 @@ describe('demodeck models', () => {
         const db = authedApp(null);
         const demoDecks = db.collection('DemoDeck').doc('I2r2gejFYwCQfqafWlVy')
         await firebase.assertSucceeds(getAllDecks());
+    })
+    it("gets the list of demo decknames", async () => {
+        const db = authedApp(null);
+        db.collection('DemoDeck').doc('I2r2gejFYwCQfqafWlVy').collection('Biology')
+        db.collection('DemoDeck').doc('I2r2gejFYwCQfqafWlVy').collection('mNeme')
+        const list = getListOfDecks('I2r2gejFYwCQfqafWlVy')
+        await firebase.assertSucceeds(list.length = 2)
     })
 })
