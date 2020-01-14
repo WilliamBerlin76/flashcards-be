@@ -2,6 +2,7 @@ const firebase = require("@firebase/testing");
 const assert = require('assert');
 const fs = require("fs");
 const { getAllDecks, getListOfDecks, getDeckById } = require('../models/demoDeckModel');
+const {addProfile, getUser, updateUser} = require('../models/usersModel')
 
 const projectId = "flashcards-test";
 
@@ -34,5 +35,20 @@ describe('demodeck models', () => {
         db.collection('DemoDeck').doc('I2r2gejFYwCQfqafWlVy').collection('Biology')
         db.collection('DemoDeck').doc('I2r2gejFYwCQfqafWlVy').collection('mNeme')
         await firebase.assertSucceeds(getDeckById('I2r2gejFYwCQfqafWlVy', 'mNeme'))
+    })
+});
+
+describe('user models', async () => {
+    it("adds a user profile given correct arguments", async () => {
+        const db = authedApp(null);
+        await firebase.assertSucceeds(addProfile('25', {name: 'testUser'}))
+    })
+    it('gets a user by id', async () => {
+        const db = authedApp(null);
+        await firebase.assertSucceeds(getUser('2'))
+    })
+    it('ubdates a users info', async () => {
+        const db = authedApp(null);
+        await firebase.assertSucceeds(updateUser('25', {name: 'testing'}))
     })
 })
