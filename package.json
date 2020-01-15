@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "server": "nodemon index.js",
-    "start": "mocha --timeout=10000",
-    "test": "mocha "
+    "start": "node index.js",
+    "test": "mocha --timeout=10000"
   },
   "repository": {
     "type": "git",
