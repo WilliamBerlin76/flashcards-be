@@ -26,6 +26,7 @@
     "express": "^4.17.1",
     "firebase-admin": "^8.8.0",
     "helmet": "^3.21.2",
+    "jest": "^24.9.0",
     "swagger-jsdoc": "^3.5.0",
     "swagger-ui-express": "^4.1.2"
   },
