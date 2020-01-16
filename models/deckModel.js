@@ -3,7 +3,8 @@ const admin = require('../config/firestore-config');
 module.exports = {
   getDeckInfo,
   getCards,
-  postCards
+  postCards,
+  getListOfDecks
 };
 
 function getDeckInfo(id, colId) {
@@ -38,4 +39,13 @@ function postCards(uid, colId, cards) {
     });
   });
   return batch.commit()
+};
+
+function getListOfDecks(id) {
+  return admin.db
+    .collection('Users')
+    .doc(id)
+    .collection('UserInformation')
+    .doc('Decks')
+    .listCollections();
 }
