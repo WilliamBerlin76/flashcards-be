@@ -394,14 +394,77 @@ router.delete('/:id/:colId/delete-deck', (req, res) => {
  *        
  */
 
-router.put('/:id/:colId/:docId', (req, res) => {
+
+
+ router.put('/update-deck-name/:id/:colId/', (req, res) => {
+   const { id, colId } = req.params;
+   const { changes } = req.body;
+
+   let deckInformation
+
+   Deck.updateDeckName(id, colId, changes).then(response => {
+     Deck.getDeckInfo(id, colId).then(snapshot => {
+      snapshot.forEach(doc => {
+        let deckInfo = doc.data();
+        deckInformation = {
+          deckName: deckInfo.deckName,
+          deckLength: deckInfo.deckLength,
+          createdBy: deckInfo.createdBy,
+          exampleCard: deckInfo.exampleCard
+        };
+      });
+      res.status(200).json({ deckInformation })
+     })
+   })
+ });
+
+ /**
+ * @swagger
+ *
+ * /api/deck/update-deck-name/:id/:colId:
+ *   put:
+ *     description: Updates a Deck's Name
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: id
+ *         description: User Id
+ *         in: params
+ *         required: true
+ *         type: string
+ *       - name: colId
+ *         description: Deck name
+ *         in: params
+ *         required: true
+ *         type: string
+ *       - name: changes
+ *         description: changes to be updated
+ *         in: body
+ *         required: true
+ *         type: object
+ *         
+ *     responses:
+ *       '201':
+ *         description: Updated Deck Information
+ *       '404': 
+ *          description: collection not found
+ *          schema: 
+ *            type: object
+ *            properties: 
+ *              error: 
+ *                type: string
+ *                description: error message
+ *        
+ */
+
+ router.put('/:id/:colId/:docId', (req, res) => {
   const { id, colId, docId } = req.params;
   const { changes } = req.body;
 
   Deck.editCard(id, colId, docId, changes).then(response => {
-  Deck.getCard(id, colId, docId).then(response => {
-    res.status(200).json({ id: docId, card: response.data() })
-  })
+    Deck.getCard(id, colId, docId).then(response => {
+      res.status(200).json({ id: docId, card: response.data() })
+    })
   })
   .catch(err => {
     res.status(500).json({ error: "the server failed to update the card"})
@@ -451,6 +514,5 @@ router.put('/:id/:colId/:docId', (req, res) => {
  *                description: error message
  *        
  */
-
 
 module.exports = router;

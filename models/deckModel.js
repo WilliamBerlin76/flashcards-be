@@ -9,9 +9,11 @@ module.exports = {
   deleteCards,
   deleteDeckInfo,
   editCard,
-  getCard
+  getCard,
+  updateDeckName
 };
 
+// Gets deck information
 function getDeckInfo(id, colId) {
   return admin.db
     .collection('Users')
@@ -22,6 +24,7 @@ function getDeckInfo(id, colId) {
     .get();
 }
 
+// returns cards by user and deck id
 function getCards(id, colId) {
   return admin.db
     .collection('Users')
@@ -34,6 +37,7 @@ function getCards(id, colId) {
     .get();
 }
 
+// adds carsds to a deck by user id and deck id
 function postCards(uid, colId, cards) {
   let batch = admin.db.batch();
  
@@ -56,6 +60,7 @@ function postCards(uid, colId, cards) {
   return batch.commit()
 };
 
+// gets list of decks by user id
 function getListOfDecks(id) {
   return admin.db
     .collection('Users')
@@ -65,6 +70,7 @@ function getListOfDecks(id) {
     .listCollections();
 }
 
+// deletes specified cards from a deck by deck id and user id
 function deleteCards(uid, colId, cards) {
   let batch = admin.db.batch();
  
@@ -84,6 +90,7 @@ function deleteCards(uid, colId, cards) {
   return batch.commit()
 };
 
+// removes the deck information from a deck by deck id and user id
 function deleteDeckInfo(uid, colId) {
   return admin.db.collection('Users')
           .doc(uid)
@@ -94,6 +101,18 @@ function deleteDeckInfo(uid, colId) {
           .delete()
 };
 
+// updates the name of a deck in the deckInformation doc by user id and deck id
+function updateDeckName(uid, colId, changes) {
+  return admin.db.collection('Users')
+          .doc(uid)
+          .collection('UserInformation')
+          .doc('Decks')
+          .collection(colId)
+          .doc('DeckInformation')
+          .update({deckName: changes.deckName})
+}
+
+// edits a card by user id, deck id, and card id
 function editCard(uid, colId, docId, changes) {
   return admin.db.collection('Users')
           .doc(uid)
@@ -106,6 +125,7 @@ function editCard(uid, colId, docId, changes) {
           .set(changes)
 };
 
+// gets an individual card by user id, deck id, and card id
 function getCard(uid, colId, docId) {
   return admin.db.collection('Users')
           .doc(uid)
