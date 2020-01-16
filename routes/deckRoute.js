@@ -31,20 +31,30 @@ router.get('/:id/:colId', (req, res) => {
 });
 
 // Batch example; posting multiple items at once.
-router.post('/', (req, res) => {
+router.post('/:uid/:colId', (req, res) => {
   const { cards } = req.body;
-
+  const { uid, colId} = req.params;
   let batch = admin.db.batch();
-
-  cards.forEach(card => {
-    batch.set(admin.db.collection('PublicDecks').doc(card.front), {
-      front: card.front,
-      back: card.back
-    });
-  });
-  batch.commit().then(response => {
-    res.status(200).json({ message: 'batched' });
-  });
+  admin.db.collection('Users').doc(uid).collection('UserInformation').doc('Decks').get().then(deckDoc => {
+    if(!deckDoc.exists){
+      admin.db.collection('Users').doc(uid).collection('UserInformation').doc('Decks').set({obj: 'created'})
+    }
+  })
+  Deck.postCards(uid, colId, cards)
+  .then(response => {
+    const deckInfo = {
+      createdBy: uid, 
+      deckLength: cards.length, 
+      exampleCard: cards[0].front
+    }
+    admin.db.collection('Users').doc(uid).collection('UserInformation').doc('Decks').collection(colId).doc('DeckInformation').set(deckInfo)
+    .then(response => {
+      res.status(200).json({ message: 'batched' });
+    })
+  })
+  .catch(err => {
+    res.status(500).json({error: 'there was an error adding your cards to the deck'})
+  })
 });
 
 module.exports = router;
