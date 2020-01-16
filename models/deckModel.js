@@ -1,4 +1,5 @@
 const admin = require('../config/firestore-config');
+const uuidv4 = require('uuid/v4');
 
 module.exports = {
   getDeckInfo,
@@ -6,7 +7,9 @@ module.exports = {
   postCards,
   getListOfDecks,
   deleteCards,
-  deleteDeckInfo
+  deleteDeckInfo,
+  editCard,
+  getCard
 };
 
 function getDeckInfo(id, colId) {
@@ -35,7 +38,16 @@ function postCards(uid, colId, cards) {
   let batch = admin.db.batch();
  
     cards.forEach(card => {
-      const deck = admin.db.collection('Users').doc(uid).collection('UserInformation').doc('Decks').collection(colId).doc('DeckInformation').collection('Cards').doc(card.front)
+      const deck = admin.db
+      .collection('Users')
+      .doc(uid)
+      .collection('UserInformation')
+      .doc('Decks')
+      .collection(colId)
+      .doc('DeckInformation')
+      .collection('Cards')
+      .doc(`${uuidv4()}`);
+      
       batch.set(deck, {
         front: card.front,
         back: card.back
@@ -57,7 +69,15 @@ function deleteCards(uid, colId, cards) {
   let batch = admin.db.batch();
  
     cards.forEach(card => {
-      const cards = admin.db.collection('Users').doc(uid).collection('UserInformation').doc('Decks').collection(colId).doc('DeckInformation').collection('Cards').doc(card.front)
+      const cards = admin.db
+      .collection('Users')
+      .doc(uid)
+      .collection('UserInformation')
+      .doc('Decks').collection(colId)
+      .doc('DeckInformation')
+      .collection('Cards')
+      .doc(card.front);
+      
       batch.delete(cards);
     });
 
@@ -72,4 +92,28 @@ function deleteDeckInfo(uid, colId) {
           .collection(colId)
           .doc('DeckInformation')
           .delete()
-}
+};
+
+function editCard(uid, colId, docId, changes) {
+  return admin.db.collection('Users')
+          .doc(uid)
+          .collection('UserInformation')
+          .doc('Decks')
+          .collection(colId)
+          .doc('DeckInformation')
+          .collection('Cards')
+          .doc(docId)
+          .set(changes)
+};
+
+function getCard(uid, colId, docId) {
+  return admin.db.collection('Users')
+          .doc(uid)
+          .collection('UserInformation')
+          .doc('Decks')
+          .collection(colId)
+          .doc('DeckInformation')
+          .collection('Cards')
+          .doc(docId)
+          .get()
+};

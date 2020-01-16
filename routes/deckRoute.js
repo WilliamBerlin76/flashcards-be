@@ -394,4 +394,63 @@ router.delete('/:id/:colId/delete-deck', (req, res) => {
  *        
  */
 
+router.put('/:id/:colId/:docId', (req, res) => {
+  const { id, colId, docId } = req.params;
+  const { changes } = req.body;
+
+  Deck.editCard(id, colId, docId, changes).then(response => {
+  Deck.getCard(id, colId, docId).then(response => {
+    res.status(200).json({ id: docId, card: response.data() })
+  })
+  })
+  .catch(err => {
+    res.status(500).json({ error: "the server failed to update the card"})
+  })
+})
+
+/**
+ * @swagger
+ *
+ * /api/deck/:id/:colId/:docId:
+ *   put:
+ *     description: Updates a card within a deck
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: id
+ *         description: User Id
+ *         in: params
+ *         required: true
+ *         type: string
+ *       - name: colId
+ *         description: Deck name
+ *         in: params
+ *         required: true
+ *         type: string
+ *       - name: docId 
+ *         description: card id
+ *         in: params
+ *         required: true
+ *         type: string
+ *       - name: changes
+ *         description: changes to be updated
+ *         in: body
+ *         required: true
+ *         type: object
+ *         
+ *     responses:
+ *       '201':
+ *         description: Updated card object
+ *       '404': 
+ *          description: collection not found
+ *          schema: 
+ *            type: object
+ *            properties: 
+ *              error: 
+ *                type: string
+ *                description: error message
+ *        
+ */
+
+
 module.exports = router;
