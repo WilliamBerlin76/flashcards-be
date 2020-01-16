@@ -4,7 +4,8 @@ module.exports = {
   getDeckInfo,
   getCards,
   postCards,
-  getListOfDecks
+  getListOfDecks,
+  deleteCards
 };
 
 function getDeckInfo(id, colId) {
@@ -52,3 +53,15 @@ function getListOfDecks(id) {
     .doc('Decks')
     .listCollections();
 }
+
+function deleteCards(uid, colId, cards) {
+  let batch = admin.db.batch();
+ 
+    cards.forEach(card => {
+      const cards = admin.db.collection('Users').doc(uid).collection('UserInformation').doc('Decks').collection(colId).doc('DeckInformation').collection('Cards').doc(card.front)
+      batch.delete(cards);
+    });
+  
+
+  return batch.commit()
+};
