@@ -175,7 +175,7 @@ router.post('/:id/:colId', (req, res) => {
  *
  * /api/deck/:id/:colId:
  *   post:
- *     description: creates deck and cards for the deck
+ *     description: creates deck and cards for a new deck
  *     produces:
  *       - application/json
  *     parameters:
@@ -207,5 +207,74 @@ router.post('/:id/:colId', (req, res) => {
  *                description: error message
  *        
  */
+
+router.post('/:id/:colId/add', (req, res) => {
+  const { cards } = req.body;
+  const { id, colId } = req.params;
+  const deckArr = [];
+  let deckInformation;
+  Deck.postCards(id, colId, cards)
+  .then(response => {
+    Deck.getDeckInfo(id, colId).then(snapshot => {
+      Deck.getCards(id, colId).then(col => {
+        col.forEach(doc => {
+          let card = doc.data();
+          deckArr.push({ id: doc.id, front: card.front, back: card.back });
+        });
+        snapshot.forEach(doc => {
+          let deckInfo = doc.data();
+          deckInformation = {
+            deckName: colId,
+            deckLength: deckInfo.deckLength + cards.length,
+            createdBy: deckInfo.createdBy,
+            exampleCard: deckInfo.exampleCard
+          };
+        });
+        admin.db.collection('Users').doc(id).collection('UserInformation').doc('Decks').collection(colId).doc('DeckInformation').update({ deckLength: deckInformation.deckLength})
+        res.status(201).json({deckInformation, cards: deckArr });
+      });
+    });
+  });
+});
+
+/**
+ * @swagger
+ *
+ * /api/deck/:id/:colId/add:
+ *   post:
+ *     description: Add cards to an existing deck
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: id
+ *         description: User Id
+ *         in: params
+ *         required: true
+ *         type: string
+ *       - name: colId
+ *         description: Deck name
+ *         in: params
+ *         required: true
+ *         type: string
+ *       - name: cards
+ *         description: array of cards
+ *         in: body
+ *         required: true
+ *         type: array
+ *     responses:
+ *       '201':
+ *         description: Array of cards by deck and deckInfo
+ *       '404': 
+ *          description: collection not found
+ *          schema: 
+ *            type: object
+ *            properties: 
+ *              error: 
+ *                type: string
+ *                description: error message
+ *        
+ */
+
+ 
 
 module.exports = router;

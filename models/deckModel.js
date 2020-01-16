@@ -31,13 +31,16 @@ function getCards(id, colId) {
 
 function postCards(uid, colId, cards) {
   let batch = admin.db.batch();
-  cards.forEach(card => {
-    const deck = admin.db.collection('Users').doc(uid).collection('UserInformation').doc('Decks').collection(colId).doc('DeckInformation').collection('Cards').doc(card.front)
-    batch.set(deck, {
-      front: card.front,
-      back: card.back
+ 
+    cards.forEach(card => {
+      const deck = admin.db.collection('Users').doc(uid).collection('UserInformation').doc('Decks').collection(colId).doc('DeckInformation').collection('Cards').doc(card.front)
+      batch.set(deck, {
+        front: card.front,
+        back: card.back
+      });
     });
-  });
+  
+
   return batch.commit()
 };
 
