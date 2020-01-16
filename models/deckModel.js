@@ -5,7 +5,8 @@ module.exports = {
   getCards,
   postCards,
   getListOfDecks,
-  deleteCards
+  deleteCards,
+  deleteDeckInfo
 };
 
 function getDeckInfo(id, colId) {
@@ -40,8 +41,6 @@ function postCards(uid, colId, cards) {
         back: card.back
       });
     });
-  
-
   return batch.commit()
 };
 
@@ -61,7 +60,16 @@ function deleteCards(uid, colId, cards) {
       const cards = admin.db.collection('Users').doc(uid).collection('UserInformation').doc('Decks').collection(colId).doc('DeckInformation').collection('Cards').doc(card.front)
       batch.delete(cards);
     });
-  
 
   return batch.commit()
 };
+
+function deleteDeckInfo(uid, colId) {
+  return admin.db.collection('Users')
+          .doc(uid)
+          .collection('UserInformation')
+          .doc('Decks')
+          .collection(colId)
+          .doc('DeckInformation')
+          .delete()
+}

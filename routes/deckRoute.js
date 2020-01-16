@@ -284,25 +284,25 @@ router.delete('/:id/:colId/delete-cards', (req, res) => {
   let deckArr = [];
 
   Deck.deleteCards(id, colId, cards).then(snapshot => {
-  Deck.getDeckInfo(id, colId).then(snapshot => {
-    Deck.getCards(id, colId).then(col => {
-      col.forEach(doc => {
-        let card = doc.data();
-        deckArr.push({ id: doc.id, front: card.front, back: card.back });
+    Deck.getDeckInfo(id, colId).then(snapshot => {
+      Deck.getCards(id, colId).then(col => {
+        col.forEach(doc => {
+          let card = doc.data();
+          deckArr.push({ id: doc.id, front: card.front, back: card.back });
+        });
+        snapshot.forEach(doc => {
+          let deckInfo = doc.data();
+          deckInformation = {
+            deckName: colId,
+            deckLength: deckArr.length,
+            createdBy: deckInfo.createdBy,
+            exampleCard: deckArr[0].front
+          };
+        });
+        admin.db.collection('Users').doc(id).collection('UserInformation').doc('Decks').collection(colId).doc('DeckInformation').update({ deckLength: deckArr.length, exampleCard: deckArr[0].front})
+        res.status(200).json({deckInformation, cards: deckArr });
       });
-      snapshot.forEach(doc => {
-        let deckInfo = doc.data();
-        deckInformation = {
-          deckName: colId,
-          deckLength: deckArr.length,
-          createdBy: deckInfo.createdBy,
-          exampleCard: deckArr[0].front
-        };
-      });
-      admin.db.collection('Users').doc(id).collection('UserInformation').doc('Decks').collection(colId).doc('DeckInformation').update({ deckLength: deckArr.length, exampleCard: deckArr[0].front})
-      res.status(200).json({deckInformation, cards: deckArr });
     });
-  });
   });
 });
 
@@ -330,6 +330,56 @@ router.delete('/:id/:colId/delete-cards', (req, res) => {
  *         in: body
  *         required: true
  *         type: array
+ *     responses:
+ *       '200':
+ *         description: Array of cards by deck and deckInfo
+ *       '404': 
+ *          description: collection not found
+ *          schema: 
+ *            type: object
+ *            properties: 
+ *              error: 
+ *                type: string
+ *                description: error message
+ *        
+ */
+
+router.delete('/:id/:colId/delete-deck', (req, res) => {
+  const { id, colId } = req.params;
+  let deckArr = [];
+
+  Deck.getCards(id, colId).then(col => {
+  col.forEach(doc => {
+    let card = doc.data();
+    deckArr.push({ id: doc.id, front: card.front, back: card.back });
+  })
+  Deck.deleteCards(id, colId, deckArr).then(deck => {
+    Deck.deleteDeckInfo(id, colId).then(response => {
+      res.status(200).json({ message: "Successfully deleted"})
+    })
+  })
+})
+})
+
+/**
+ * @swagger
+ *
+ * /api/deck/:id/:colId/delete-deck:
+ *   delete:
+ *     description: Deletes a deck with all of its cards
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: id
+ *         description: User Id
+ *         in: params
+ *         required: true
+ *         type: string
+ *       - name: colId
+ *         description: Deck name
+ *         in: params
+ *         required: true
+ *         type: string
  *     responses:
  *       '200':
  *         description: Array of cards by deck and deckInfo
