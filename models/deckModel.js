@@ -37,7 +37,7 @@ function getCards(id, colId) {
     .get();
 }
 
-// adds carsds to a deck by user id and deck id
+// adds cards to a deck by user id and deck id
 function postCards(uid, colId, cards) {
   let batch = admin.db.batch();
  
@@ -82,7 +82,7 @@ function deleteCards(uid, colId, cards) {
       .doc('Decks').collection(colId)
       .doc('DeckInformation')
       .collection('Cards')
-      .doc(card.front);
+      .doc(card.id);
       
       batch.delete(cards);
     });
