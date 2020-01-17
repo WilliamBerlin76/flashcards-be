@@ -12,7 +12,12 @@ module.exports = {
   getCard,
   updateDeckName,
   archiveDeck,
-  unArchiveDeck
+  unArchiveDeck,
+  deleteArchivedInfo,
+  deleteArchivedCards,
+  getArchivedInfo,
+  getArchivedCards,
+  postArchivedCards
 };
 
 // Gets deck information
@@ -22,6 +27,16 @@ function getDeckInfo(id, colId) {
     .doc(id)
     .collection('UserInformation')
     .doc('Decks')
+    .collection(colId)
+    .get();
+}
+
+function getArchivedInfo(id, colId) {
+  return admin.db
+    .collection('Users')
+    .doc(id)
+    .collection('UserInformation')
+    .doc('Archives')
     .collection(colId)
     .get();
 }
@@ -39,6 +54,19 @@ function getCards(id, colId) {
     .get();
 }
 
+function getArchivedCards(id, colId) {
+  return admin.db
+    .collection('Users')
+    .doc(id)
+    .collection('UserInformation')
+    .doc('Archives')
+    .collection(colId)
+    .doc('DeckInformation')
+    .collection('Cards')
+    .get();
+}
+
+
 // adds cards to a deck by user id and deck id
 function postCards(uid, colId, cards) {
   let batch = admin.db.batch();
@@ -53,6 +81,28 @@ function postCards(uid, colId, cards) {
       .doc('DeckInformation')
       .collection('Cards')
       .doc(`${uuidv4()}`);
+      
+      batch.set(deck, {
+        front: card.front,
+        back: card.back
+      });
+    });
+  return batch.commit()
+};
+
+function postArchivedCards(uid, colId, cards) {
+  let batch = admin.db.batch();
+ 
+    cards.forEach(card => {
+      const deck = admin.db
+      .collection('Users')
+      .doc(uid)
+      .collection('UserInformation')
+      .doc('Decks')
+      .collection(colId)
+      .doc('DeckInformation')
+      .collection('Cards')
+      .doc(card.id);
       
       batch.set(deck, {
         front: card.front,
@@ -92,12 +142,40 @@ function deleteCards(uid, colId, cards) {
   return batch.commit()
 };
 
+function deleteArchivedCards(uid, colId, cards) {
+  let batch = admin.db.batch();
+ 
+    cards.forEach(card => {
+      const cards = admin.db
+      .collection('Users')
+      .doc(uid)
+      .collection('UserInformation')
+      .doc('Archives').collection(colId)
+      .doc('DeckInformation')
+      .collection('Cards')
+      .doc(card.id);
+      
+      batch.delete(cards);
+    });
+
+  return batch.commit()
+};
 // removes the deck information from a deck by deck id and user id
 function deleteDeckInfo(uid, colId) {
   return admin.db.collection('Users')
           .doc(uid)
           .collection('UserInformation')
           .doc('Decks')
+          .collection(colId)
+          .doc('DeckInformation')
+          .delete()
+};
+
+function deleteArchivedInfo(uid, colId) {
+  return admin.db.collection('Users')
+          .doc(uid)
+          .collection('UserInformation')
+          .doc('Archives')
           .collection(colId)
           .doc('DeckInformation')
           .delete()

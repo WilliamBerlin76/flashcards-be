@@ -594,5 +594,83 @@ router.post('/archive/:id/:colId', (req, res) => {
  *        
  */
 
- 
+router.post('/remove-archive/:id/:colId', (req, res) => {
+  let deckArr = [];
+  const {id, colId} = req.params;
+  let deckInformation;
+  admin.db.collection('Users').doc(id).collection('UserInformation').doc('Decks').get().then(deckDoc => {
+    if(!deckDoc.exists){
+      admin.db.collection('Users').doc(id).collection('UserInformation').doc('Decks').set({obj: 'created'})
+    }
+  })
+  Deck.getArchivedCards(id, colId)
+    .then(col => {
+      col.forEach(doc => {
+        let card = doc.data();
+        deckArr.push({id: doc.id, front: card.front, back: card.back})
+        Deck.getArchivedInfo(id, colId).then(snapshot => {
+          snapshot.forEach(doc => {
+            let deckInfo = doc.data();
+            deckInformation = {
+              deckName: colId,
+              deckLength: deckInfo.deckLength,
+              createdBy: deckInfo.createdBy,
+              exampleCard: deckInfo.exampleCard
+            }
+          
+          Deck.postArchivedCards(id, colId, deckArr)
+          .then(response => {
+            admin.db.collection('Users').doc(id).collection('UserInformation').doc('Decks').collection(colId).doc('DeckInformation').set(deckInformation)
+            .then(response => {
+              Deck.deleteArchivedCards(id, colId, deckArr)
+              .then(response => {
+                Deck.deleteArchivedInfo(id, colId)
+              })
+            })   
+          })
+        })
+      })
+    })
+    res.status(201).json({ message: 'Deck has been retrieved' })
+  })
+  .catch(err => {
+    console.log(err)
+    res.status(500).json({ error: 'the server could not return the deck to Decks collection' })
+  })
+})
+
+/**
+ * @swagger
+ *
+ * /api/deck/remove-archive/:id/:colId:
+ *   post:
+ *     description: Moves a users deck from archives to Decks subcollection
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: id
+ *         description: User Id
+ *         in: params
+ *         required: true
+ *         type: string
+ *       - name: colId
+ *         description: Deck name
+ *         in: params
+ *         required: true
+ *         type: string
+ *         
+ *     responses:
+ *       '201':
+ *         description: Moved selected deck into the Decks subcollection
+ *       '500': 
+ *          description: Deck could not be moved over
+ *          schema: 
+ *            type: object
+ *            properties: 
+ *              error: 
+ *                type: string
+ *                description: error message
+ *        
+ */
+
 module.exports = router;
