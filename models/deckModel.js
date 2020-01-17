@@ -10,7 +10,9 @@ module.exports = {
   deleteDeckInfo,
   editCard,
   getCard,
-  updateDeckName
+  updateDeckName,
+  archiveDeck,
+  unArchiveDeck
 };
 
 // Gets deck information
@@ -137,3 +139,43 @@ function getCard(uid, colId, docId) {
           .doc(docId)
           .get()
 };
+
+function archiveDeck(uid, colId, cards) {
+  let batch = admin.db.batch();
+
+    cards.forEach(card => {
+      const deck = admin.db.collection('Users')
+                    .doc(uid)
+                    .collection('UserInformation')
+                    .doc('Archives')
+                    .collection(colId)
+                    .doc('DeckInformation')
+                    .collection('Cards')
+                    .doc(card.id)
+      batch.set(deck, {
+        front: card.front,
+        back: card.back
+      });
+    });
+  return batch.commit()
+}
+
+function unArchiveDeck(uid, colId, cards) {
+  let batch = admin.db.batch();
+
+    cards.forEach(card => {
+      const deck = admin.db.collection('Users')
+                    .doc(uid)
+                    .collection('UserInformation')
+                    .doc('Decks')
+                    .collection(colId)
+                    .doc('DeckInformation')
+                    .collection('Cards')
+                    .doc(card.id)
+      batch.set(deck, {
+        front: card.front,
+        back: card.back
+      });
+    });
+  return batch.commit()
+}
