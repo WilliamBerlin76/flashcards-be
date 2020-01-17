@@ -32,7 +32,7 @@ function verifyUser(req, res, next) {
       next();
     })
     .catch(err => res.status(401).json({ error: 'You are not logged in!' }));
-}
+};
 
 let db = admin.firestore();
 
