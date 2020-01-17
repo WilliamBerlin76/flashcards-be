@@ -35,7 +35,7 @@ router.get('/:id/archive', (req, res) => {
 /**
  * @swagger
  *
- * /api/deck/:id:
+ * /api/deck/:id/archive:
  *   get:
  *     description: Get all archived decks and their information associated with a user id
  *     produces:
@@ -88,6 +88,89 @@ router.get('/:id/:colId/archive', (req, res) => {
       res.status(404).json({ error: 'deck does not exist' });
     });
 });
+
+/**
+ * @swagger
+ *
+ * /api/deck/:id/:colId/archive:
+ *   get:
+ *     description: Get all cards from a users archived deck
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: id
+ *         description: User Id
+ *         in: params
+ *         required: true
+ *         type: string
+ *       - name: colId
+ *         description: Deck name
+ *         in: params
+ *         required: true
+ *         type: string
+ *     responses:
+ *       '200':
+ *         description: Array of cards by deck, and deckinfo
+ *       '404':
+ *          description: collection not found
+ *          schema:
+ *            type: object
+ *            properties:
+ *              error:
+ *                type: string
+ *                description: error message
+ *
+ */
+
+router.delete('/:id/:colId/delete-archived-deck', (req, res) => {
+  const { id, colId } = req.params;
+  let deckArr = [];
+
+  Deck.getArchivedCards(id, colId).then(col => {
+    col.forEach(doc => {
+      let card = doc.data();
+      deckArr.push({ id: doc.id, front: card.front, back: card.back });
+    });
+    Deck.deleteArchivedCards(id, colId, deckArr).then(deck => {
+      Deck.deleteArchivedInfo(id, colId).then(response => {
+        res.status(200).json({ message: 'Successfully deleted' });
+      });
+    });
+  });
+});
+
+/**
+ * @swagger
+ *
+ * /api/deck/:id/:colId/delete-archived-deck:
+ *   delete:
+ *     description: Deletes an archived deck with all of its cards
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: id
+ *         description: User Id
+ *         in: params
+ *         required: true
+ *         type: string
+ *       - name: colId
+ *         description: Deck name
+ *         in: params
+ *         required: true
+ *         type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully deleted message
+ *       '404':
+ *          description: collection not found
+ *          schema:
+ *            type: object
+ *            properties:
+ *              error:
+ *                type: string
+ *                description: error message
+ *
+ */
 
 router.get('/:id', (req, res) => {
   const { id } = req.params;
@@ -506,7 +589,7 @@ router.delete('/:id/:colId/delete-deck', (req, res) => {
  *         type: string
  *     responses:
  *       '200':
- *         description: Array of cards by deck and deckInfo
+ *         description: Successfully deleted message
  *       '404':
  *          description: collection not found
  *          schema:
