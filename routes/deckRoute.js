@@ -70,7 +70,12 @@ router.get('/:id/:colId/archive', (req, res) => {
       Deck.getArchivedCards(id, colId).then(col => {
         col.forEach(doc => {
           let card = doc.data();
-          deckArr.push({ id: doc.id, front: card.front, back: card.back });
+          deckArr.push({
+            id: doc.id,
+            front: card.front,
+            back: card.back,
+            archived: card.archived
+          });
         });
         snapshot.forEach(doc => {
           let deckInfo = doc.data();
@@ -240,7 +245,12 @@ router.get('/:id/:colId', (req, res) => {
       Deck.getCards(id, colId).then(col => {
         col.forEach(doc => {
           let card = doc.data();
-          deckArr.push({ id: doc.id, front: card.front, back: card.back });
+          deckArr.push({
+            id: doc.id,
+            front: card.front,
+            back: card.back,
+            archived: card.archived
+          });
         });
         snapshot.forEach(doc => {
           let deckInfo = doc.data();
@@ -338,7 +348,8 @@ router.post('/:id/:colId', (req, res) => {
                 deckArr.push({
                   id: doc.id,
                   front: card.front,
-                  back: card.back
+                  back: card.back,
+                  archived: card.archived
                 });
               });
               snapshot.forEach(doc => {
@@ -410,7 +421,12 @@ router.post('/:id/:colId/add', (req, res) => {
       Deck.getCards(id, colId).then(col => {
         col.forEach(doc => {
           let card = doc.data();
-          deckArr.push({ id: doc.id, front: card.front, back: card.back });
+          deckArr.push({
+            id: doc.id,
+            front: card.front,
+            back: card.back,
+            archived: card.archived
+          });
         });
         snapshot.forEach(doc => {
           let deckInfo = doc.data();
@@ -485,7 +501,12 @@ router.delete('/:id/:colId/delete-cards', (req, res) => {
       Deck.getCards(id, colId).then(col => {
         col.forEach(doc => {
           let card = doc.data();
-          deckArr.push({ id: doc.id, front: card.front, back: card.back });
+          deckArr.push({
+            id: doc.id,
+            front: card.front,
+            back: card.back,
+            archived: card.archived
+          });
         });
         snapshot.forEach(doc => {
           let deckInfo = doc.data();
@@ -745,7 +766,12 @@ router.post('/archive/:id/:colId', (req, res) => {
     .then(col => {
       col.forEach(doc => {
         let card = doc.data();
-        deckArr.push({ id: doc.id, front: card.front, back: card.back });
+        deckArr.push({
+          id: doc.id,
+          front: card.front,
+          back: card.back,
+          archived: card.archived
+        });
         Deck.getDeckInfo(id, colId).then(snapshot => {
           snapshot.forEach(doc => {
             let deckInfo = doc.data();
@@ -839,7 +865,12 @@ router.post('/remove-archive/:id/:colId', (req, res) => {
     .then(col => {
       col.forEach(doc => {
         let card = doc.data();
-        deckArr.push({ id: doc.id, front: card.front, back: card.back });
+        deckArr.push({
+          id: doc.id,
+          front: card.front,
+          back: card.back,
+          archived: card.archived
+        });
         Deck.getArchivedInfo(id, colId).then(snapshot => {
           snapshot.forEach(doc => {
             let deckInfo = doc.data();

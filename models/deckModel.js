@@ -84,7 +84,8 @@ function postCards(uid, colId, cards) {
 
     batch.set(deck, {
       front: card.front,
-      back: card.back
+      back: card.back,
+      archived: false
     });
   });
   return batch.commit();
@@ -106,7 +107,8 @@ function postArchivedCards(uid, colId, cards) {
 
     batch.set(deck, {
       front: card.front,
-      back: card.back
+      back: card.back,
+      archived: card.archived
     });
   });
   return batch.commit();
@@ -249,7 +251,8 @@ function archiveDeck(uid, colId, cards) {
       .doc(card.id);
     batch.set(deck, {
       front: card.front,
-      back: card.back
+      back: card.back,
+      archived: card.archived
     });
   });
   return batch.commit();
