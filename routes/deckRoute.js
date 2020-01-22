@@ -10,21 +10,25 @@ router.get('/:id/archive', (req, res) => {
 
   Deck.getListOfArchivedDecks(id)
     .then(collections => {
-      for (let collection of collections) {
-        deckArr.push(collection.id);
-      }
+      if (collections.length > 0) {
+        for (let collection of collections) {
+          deckArr.push(collection.id);
+        }
 
-      deckArr.forEach(deck => {
-        Deck.getArchivedInfo(id, deck).then(snapshot => {
-          snapshot.forEach(doc => {
-            let deckInfo = doc.data();
-            infoArr.push(deckInfo);
+        deckArr.forEach(deck => {
+          Deck.getArchivedInfo(id, deck).then(snapshot => {
+            snapshot.forEach(doc => {
+              let deckInfo = doc.data();
+              infoArr.push(deckInfo);
+            });
+            if (infoArr.length == deckArr.length) {
+              res.status(200).json(infoArr);
+            }
           });
-          if (infoArr.length == deckArr.length) {
-            res.status(200).json({ decksInfo: infoArr });
-          }
         });
-      });
+      } else {
+        res.status(200).json(deckArr);
+      }
     })
     .catch(err => {
       console.log(err);
@@ -251,8 +255,7 @@ router.get('/:id/:colId', (req, res) => {
           let card = doc.data();
           deckArr.push({
             id: doc.id,
-            front: card.front,
-            back: card.back,
+            data: card,
             archived: card.archived
           });
         });
@@ -265,7 +268,7 @@ router.get('/:id/:colId', (req, res) => {
             exampleCard: deckInfo.exampleCard
           };
         });
-        res.status(200).json({ deckInformation, cards: deckArr });
+        res.status(200).json({ deckInformation, data: deckArr });
       });
     })
     .catch(err => {
