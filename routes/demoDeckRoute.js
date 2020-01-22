@@ -38,15 +38,15 @@ router.get('/', (req, res) => {
  *     responses:
  *       '200':
  *         description: Array of Deck Names
- *       '404': 
+ *       '404':
  *          description: collection not found
- *          schema: 
+ *          schema:
  *            type: object
- *            properties: 
- *              error: 
+ *            properties:
+ *              error:
  *                type: string
  *                description: error message
- *        
+ *
  */
 
 router.get('/:id', (req, res) => {
@@ -56,7 +56,10 @@ router.get('/:id', (req, res) => {
   Demo.getListOfDecks(id)
     .then(collections => {
       for (let collection of collections) {
-        decArr.push(collection.id);
+        decArr.push({
+          deckName: collection.id,
+          demo: true
+        });
       }
       res.status(200).json(decArr);
     })
@@ -91,15 +94,15 @@ router.get('/:id', (req, res) => {
  *     responses:
  *       '200':
  *         description: Receive an Object with the deckname and data array containing each card as an object
- *       '404': 
+ *       '404':
  *          description: collection not found
- *          schema: 
+ *          schema:
  *            type: object
- *            properties: 
- *              error: 
+ *            properties:
+ *              error:
  *                type: string
  *                description: error message
- *        
+ *
  */
 
 router.get('/:id/:colId', verifyDeck.verifyDeckId, (req, res) => {
