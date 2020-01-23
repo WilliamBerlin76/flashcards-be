@@ -255,8 +255,7 @@ router.get('/:id/:colId', (req, res) => {
           let card = doc.data();
           deckArr.push({
             id: doc.id,
-            data: card,
-            archived: card.archived
+            data: card
           });
         });
         snapshot.forEach(doc => {
@@ -354,21 +353,19 @@ router.post('/:id/:colId', (req, res) => {
                 let card = doc.data();
                 deckArr.push({
                   id: doc.id,
-                  front: card.front,
-                  back: card.back,
-                  archived: card.archived
+                  data: card
                 });
               });
               snapshot.forEach(doc => {
                 let deckInfo = doc.data();
                 deckInformation = {
-                  deckName: colId,
+                  deckName: deckInfo.deckName,
                   deckLength: deckInfo.deckLength,
                   createdBy: deckInfo.createdBy,
                   exampleCard: deckInfo.exampleCard
                 };
               });
-              res.status(200).json({ deckInformation, cards: deckArr });
+              res.status(200).json({ deckInformation, data: deckArr });
             });
           });
         });
@@ -430,29 +427,19 @@ router.post('/:id/:colId/add', (req, res) => {
           let card = doc.data();
           deckArr.push({
             id: doc.id,
-            front: card.front,
-            back: card.back,
-            archived: card.archived
+            data: card
           });
         });
         snapshot.forEach(doc => {
           let deckInfo = doc.data();
           deckInformation = {
-            deckName: colId,
-            deckLength: deckArr.length,
+            deckName: deckInfo.deckName,
+            deckLength: deckInfo.deckLength,
             createdBy: deckInfo.createdBy,
             exampleCard: deckInfo.exampleCard
           };
         });
-        admin.db
-          .collection('Users')
-          .doc(id)
-          .collection('UserInformation')
-          .doc('Decks')
-          .collection(colId)
-          .doc('DeckInformation')
-          .update({ deckLength: deckArr.length });
-        res.status(201).json({ deckInformation, cards: deckArr });
+        res.status(200).json({ deckInformation, data: deckArr });
       });
     });
   });
@@ -510,18 +497,16 @@ router.delete('/:id/:colId/delete-cards', (req, res) => {
           let card = doc.data();
           deckArr.push({
             id: doc.id,
-            front: card.front,
-            back: card.back,
-            archived: card.archived
+            data: card
           });
         });
         snapshot.forEach(doc => {
           let deckInfo = doc.data();
           deckInformation = {
-            deckName: colId,
-            deckLength: deckArr.length,
+            deckName: deckInfo.deckName,
+            deckLength: deckInfo.deckLength,
             createdBy: deckInfo.createdBy,
-            exampleCard: deckArr[0].front
+            exampleCard: deckInfo.exampleCard
           };
         });
         admin.db
@@ -703,8 +688,7 @@ router.put('/update/:id/:colId/', (req, res) => {
             let card = doc.data();
             deckArr.push({
               id: doc.id,
-              data: card,
-              archived: card.archived
+              data: card
             });
           });
           snapshot.forEach(doc => {
@@ -716,7 +700,7 @@ router.put('/update/:id/:colId/', (req, res) => {
               exampleCard: deckInfo.exampleCard
             };
           });
-          res.status(200).json({ deckInformation, data: deckArr });
+          res.status(201).json({ deckInformation, data: deckArr });
         });
       });
     })
@@ -728,7 +712,7 @@ router.put('/update/:id/:colId/', (req, res) => {
 /**
  * @swagger
  *
- * /api/deck/:id/:colId/:docId:
+ * /api/deck/update/:id/:colId:
  *   put:
  *     description: Updates a card within a deck
  *     produces:
@@ -744,11 +728,6 @@ router.put('/update/:id/:colId/', (req, res) => {
  *         in: params
  *         required: true
  *         type: string
- *       - name: docId
- *         description: card id
- *         in: params
- *         required: true
- *         type: string
  *       - name: changes
  *         description: changes to be updated
  *         in: body
@@ -757,7 +736,7 @@ router.put('/update/:id/:colId/', (req, res) => {
  *
  *     responses:
  *       '201':
- *         description: Updated card object
+ *         description: Updated card array
  *       '404':
  *          description: collection not found
  *          schema:
