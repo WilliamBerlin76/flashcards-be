@@ -208,18 +208,29 @@ function updateDeckName(uid, colId, changes) {
     .update({ deckName: changes.deckName });
 }
 
-// edits a card by user id, deck id, and card id
-function editCard(uid, colId, docId, changes) {
-  return admin.db
-    .collection('Users')
-    .doc(uid)
-    .collection('UserInformation')
-    .doc('Decks')
-    .collection(colId)
-    .doc('DeckInformation')
-    .collection('Cards')
-    .doc(docId)
-    .set(changes);
+// edits a card by user id and deck id. expects an array of cards
+function editCard(uid, colId, changes) {
+  let batch = admin.db.batch();
+
+  changes.forEach(card => {
+    const cards = admin.db
+      .collection('Users')
+      .doc(uid)
+      .collection('UserInformation')
+      .doc('Decks')
+      .collection(colId)
+      .doc('DeckInformation')
+      .collection('Cards')
+      .doc(card.id);
+
+    batch.set(cards, {
+      front: card.front,
+      back: card.back,
+      archived: card.archived
+    });
+  });
+
+  return batch.commit();
 }
 
 // gets an individual card by user id, deck id, and card id

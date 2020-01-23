@@ -690,14 +690,34 @@ router.put('/update-deck-name/:id/:colId/', (req, res) => {
  *
  */
 
-router.put('/:id/:colId/:docId', (req, res) => {
-  const { id, colId, docId } = req.params;
+router.put('/update/:id/:colId/', (req, res) => {
+  const { id, colId } = req.params;
   const { changes } = req.body;
 
-  Deck.editCard(id, colId, docId, changes)
+  const deckArr = [];
+  Deck.editCard(id, colId, changes)
     .then(response => {
-      Deck.getCard(id, colId, docId).then(response => {
-        res.status(200).json({ id: docId, card: response.data() });
+      Deck.getDeckInfo(id, colId).then(snapshot => {
+        Deck.getCards(id, colId).then(col => {
+          col.forEach(doc => {
+            let card = doc.data();
+            deckArr.push({
+              id: doc.id,
+              data: card,
+              archived: card.archived
+            });
+          });
+          snapshot.forEach(doc => {
+            let deckInfo = doc.data();
+            deckInformation = {
+              deckName: deckInfo.deckName,
+              deckLength: deckInfo.deckLength,
+              createdBy: deckInfo.createdBy,
+              exampleCard: deckInfo.exampleCard
+            };
+          });
+          res.status(200).json({ deckInformation, data: deckArr });
+        });
       });
     })
     .catch(err => {
