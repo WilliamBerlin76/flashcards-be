@@ -1,5 +1,5 @@
 const firebase = require("@firebase/testing");
-
+const admin = require('../config/firestore-config');
 
 const chai = require('chai');
 const expect = chai.expect;
@@ -43,9 +43,24 @@ beforeEach(async () => {
 
 describe('deck models', () => {
     
-    it("gets the deck info", async () => {
-        const db = authedApp(null)
-        await firebase.assertSucceeds(getDeckInfo)
+    it("DeckInfo is set and can be retrieved as an object", async () => {
+        // const db = authedApp(null)
+        let deckInformation
+        await admin.db.collection('Users')
+                        .doc('1223')
+                        .collection('UserInformation')
+                        .doc('Decks')
+                        .collection('Biology')
+                        .doc('DeckInformation')
+                        .set({createdBy: 'user',
+                              length: 5,
+                              exampleCard: 'spanish'
+                    })
+        const retrievedInfo = await getDeckInfo('1223', 'Biology')
+        retrievedInfo.forEach(doc => {
+            deckInformation = doc.data()
+        })
+        assert.typeOf(deckInformation, 'object')
     })
     it("gets the cards", async () => {
         const db = authedApp(null)
