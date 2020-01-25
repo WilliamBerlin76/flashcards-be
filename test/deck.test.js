@@ -1,4 +1,4 @@
-const firebase = require("@firebase/testing");
+// const firebase = require("@firebase/testing");
 const admin = require('../config/firestore-config');
 const uuidv4 = require('uuid/v4');
 
@@ -29,21 +29,23 @@ const {
     getListOfArchivedDecks 
 } = require('../models/deckModel');
 
-const projectId = "flashcards-test";
+// const projectId = "flashcards-test";
 
-const coverageUrl = `http://localhost:8888/emulator/v1/projects/${projectId}:ruleCoverage.html`;
+// const coverageUrl = `http://localhost:8888/emulator/v1/projects/${projectId}:ruleCoverage.html`;
 
-function authedApp(auth) {
-    return firebase.initializeTestApp({ projectId, auth }).firestore();
-};
+// function authedApp(auth) {
+//     return firebase.initializeTestApp({ projectId, auth }).firestore();
+// };
 
-beforeEach(async () => {
-    // Clear the database between tests
-    await firebase.clearFirestoreData({ projectId });
-});
+// beforeEach(async () => {
+//     // Clear the database between tests
+//     await firebase.clearFirestoreData({ projectId });
+// });
 
 describe('deck models', () => {
-    
+    const cards = [{front: 'front', back: 'back'},
+                    {front: 'front', back: 'back'},
+                    {front: 'front', back: 'back'}]
     it("DeckInfo is set and can be retrieved as an object", async () => {
         let deckInformation
         await admin.db.collection('Users')
@@ -65,10 +67,7 @@ describe('deck models', () => {
     describe('postCards, getCards', () => {
         it("postCards adds cards to a deck. getCards returns all of the cards from the deck", async () => {
             const returnedCards = []
-            const cards = [{front: 'front', back: 'back'},
-                                {front: 'front', back: 'back'},
-                                {front: 'front', back: 'back'}
-                            ]
+            
             await postCards('testUser', "testDeck", cards);
             const cardsList = await getCards('testUser', "testDeck")
             cardsList.forEach(doc => {
@@ -78,8 +77,6 @@ describe('deck models', () => {
             
         });
         it("archived is automatically set to false on card creation", async () => {
-            const cards = [{front: 'front', back: 'back'},
-                         {front: 'front', back: "back"}]
             const returnedCards = [];
             await postCards("1234", "Spanish", cards)
             const cardsList = await getCards("1234", "Spanish")
@@ -94,9 +91,6 @@ describe('deck models', () => {
             const returnedIds = [];
             const lastCards = [];
             let count = 0;
-            const cards = [{front: 'front', back: 'back'},
-                                {front: 'front', back: 'back'},
-                                {front: 'front', back: 'back'}]
             //add cards to deck
             await postCards('test', "Deck", cards)
             const cardsList = await getCards("test", "Deck")
@@ -117,4 +111,41 @@ describe('deck models', () => {
             assert.lengthOf(lastCards, 1);
         });
     });
+    describe('editCard', () => {
+        it('updates selected cards', async () => {
+            let count = 0;
+            let returnedCards = [];
+            let lastArr = [];
+            await postCards('user', "deck", cards);
+            const cardsList = await getCards("user", "deck")
+            
+            cardsList.forEach(doc => {
+                /* 
+                    card contains the id to send to the db along with the changes that
+                    will be sent specifically for the id
+                */
+               const card = {
+                                id: doc.id, 
+                                front: "Changed front", 
+                                back: "changed back", 
+                                archived: true
+                            }
+               count === 3 ? count = 3 : count ++;
+               count < 3 ? returnedCards.push(card) : null;
+            });
+            // edit cards in the deck in the db
+            await editCard('user', 'deck', returnedCards )
+
+            //check updated cards for the changes
+            const updatedCards = await getCards('user', 'deck')
+            updatedCards.forEach(doc => {
+                console.log(doc.data().archived)
+                doc.data().archived === true ? lastArr.push(doc.data()) : null
+            })
+            // check that only the selected cards were updated
+            assert.lengthOf(lastArr, 2);
+            // check that the value was actually updated as specified
+            assert.equal(returnedCards[0,1].archived, true);
+        })
+    })
 });
