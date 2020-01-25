@@ -62,30 +62,59 @@ describe('deck models', () => {
         })
         assert.typeOf(deckInformation, 'object')
     })
-    it("returns all of the cards from the deck", async () => {
-        const returnedCards = []
-        const cards = [{front: 'front', back: 'back'},
-                            {front: 'front', back: 'back'},
-                            {front: 'front', back: 'back'}
-                        ]
-        await postCards('testUser', "testDeck", cards);
-        const cardsList = await getCards('testUser', "testDeck")
-        cardsList.forEach(doc => {
-            return returnedCards.push(doc.data())
-        })
-        assert.lengthOf(returnedCards, 3)
-        
-    })
-    it("archived is automatically set to false on card creation", async () => {
-        const db = authedApp(null)
-        const cards = [{front: 'front', back: 'back'},
-                     {front: 'front', back: "back"}]
-        const returnedCards = [];
-        await firebase.assertSucceeds(postCards("1234", "Spanish", cards))
-        const cardsList = await getCards("1234", "Spanish")
-        cardsList.forEach(doc => {
-            return returnedCards.push(doc.data())
-        })
-        assert.equal(returnedCards[0].archived, false);
-    })
-})
+    describe('postCards, getCards', () => {
+        it("postCards adds cards to a deck. getCards returns all of the cards from the deck", async () => {
+            const returnedCards = []
+            const cards = [{front: 'front', back: 'back'},
+                                {front: 'front', back: 'back'},
+                                {front: 'front', back: 'back'}
+                            ]
+            await postCards('testUser', "testDeck", cards);
+            const cardsList = await getCards('testUser', "testDeck")
+            cardsList.forEach(doc => {
+                return returnedCards.push(doc.data())
+            })
+            assert.lengthOf(returnedCards, 3)
+            
+        });
+        it("archived is automatically set to false on card creation", async () => {
+            const cards = [{front: 'front', back: 'back'},
+                         {front: 'front', back: "back"}]
+            const returnedCards = [];
+            await postCards("1234", "Spanish", cards)
+            const cardsList = await getCards("1234", "Spanish")
+            cardsList.forEach(doc => {
+                return returnedCards.push(doc.data())
+            })
+            assert.equal(returnedCards[0].archived, false);
+        });
+    });
+    describe('deleteCards', () => {
+        it('removes multiple selected cards from a deck', async () => {
+            const returnedIds = [];
+            const lastCards = [];
+            let count = 0;
+            const cards = [{front: 'front', back: 'back'},
+                                {front: 'front', back: 'back'},
+                                {front: 'front', back: 'back'}]
+            //add cards to deck
+            await postCards('test', "Deck", cards)
+            const cardsList = await getCards("test", "Deck")
+            cardsList.forEach(doc => {
+                /* populates array of card Ids that exist in the db
+                   array will be sent to the function to specify cards to delete 
+                */
+                count === 3 ? count = 3 : count ++;
+                count < 3 ? returnedIds.push({id: doc.id}) : null;
+            });
+            // delete array of cards specified in above forEach
+            await deleteCards('test', 'Deck', returnedIds)
+            const newCardsList = await getCards("test", "Deck")
+            newCardsList.forEach(doc => {
+                // sets final returned cards to an array
+                lastCards.push(doc.data())
+            });
+            assert.lengthOf(lastCards, 1);
+        });
+    });
+});
