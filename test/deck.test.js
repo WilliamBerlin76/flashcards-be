@@ -1,5 +1,6 @@
 const firebase = require("@firebase/testing");
 const admin = require('../config/firestore-config');
+const uuidv4 = require('uuid/v4');
 
 const chai = require('chai');
 const expect = chai.expect;
@@ -44,7 +45,6 @@ beforeEach(async () => {
 describe('deck models', () => {
     
     it("DeckInfo is set and can be retrieved as an object", async () => {
-        // const db = authedApp(null)
         let deckInformation
         await admin.db.collection('Users')
                         .doc('1223')
@@ -62,9 +62,19 @@ describe('deck models', () => {
         })
         assert.typeOf(deckInformation, 'object')
     })
-    it("gets the cards", async () => {
-        const db = authedApp(null)
-        await firebase.assertSucceeds(getCards)
+    it("returns all of the cards from the deck", async () => {
+        const returnedCards = []
+        const cards = [{front: 'front', back: 'back'},
+                            {front: 'front', back: 'back'},
+                            {front: 'front', back: 'back'}
+                        ]
+        await postCards('testUser', "testDeck", cards);
+        const cardsList = await getCards('testUser', "testDeck")
+        cardsList.forEach(doc => {
+            return returnedCards.push(doc.data())
+        })
+        assert.lengthOf(returnedCards, 3)
+        
     })
     it("archived is automatically set to false on card creation", async () => {
         const db = authedApp(null)
