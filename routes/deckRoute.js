@@ -83,12 +83,7 @@ router.get('/:id/:colId/archive', (req, res) => {
         });
         snapshot.forEach(doc => {
           let deckInfo = doc.data();
-          deckInformation = {
-            deckName: deckInfo.deckName,
-            deckLength: deckInfo.deckLength,
-            createdBy: deckInfo.createdBy,
-            exampleCard: deckInfo.exampleCard
-          };
+          deckInformation = deckInfo;
         });
         res.status(200).json({ deckInformation, cards: deckArr });
       });
@@ -260,12 +255,7 @@ router.get('/:id/:colId', (req, res) => {
         });
         snapshot.forEach(doc => {
           let deckInfo = doc.data();
-          deckInformation = {
-            deckName: deckInfo.deckName,
-            deckLength: deckInfo.deckLength,
-            createdBy: deckInfo.createdBy,
-            exampleCard: deckInfo.exampleCard
-          };
+          deckInformation = deckInfo;
         });
         res.status(200).json({ deckInformation, data: deckArr });
       });
@@ -309,9 +299,10 @@ router.get('/:id/:colId', (req, res) => {
  */
 
 router.post('/:id/:colId', (req, res) => {
-  const { cards } = req.body;
+  const { cards, deck } = req.body;
   const { id, colId } = req.params;
   let deckArr = [];
+  let deckInformation;
   let batch = admin.db.batch();
   admin.db
     .collection('Users')
@@ -336,7 +327,9 @@ router.post('/:id/:colId', (req, res) => {
         collectionId: colId,
         deckName: colId,
         deckLength: cards.length,
-        exampleCard: cards[0].front
+        exampleCard: cards[0].front,
+        tags: deck.tags,
+        icon: deck.icon
       };
       admin.db
         .collection('Users')
@@ -358,12 +351,7 @@ router.post('/:id/:colId', (req, res) => {
               });
               snapshot.forEach(doc => {
                 let deckInfo = doc.data();
-                deckInformation = {
-                  deckName: deckInfo.deckName,
-                  deckLength: deckInfo.deckLength,
-                  createdBy: deckInfo.createdBy,
-                  exampleCard: deckInfo.exampleCard
-                };
+                deckInformation = deckInfo;
               });
               res.status(200).json({ deckInformation, data: deckArr });
             });
@@ -432,14 +420,20 @@ router.post('/:id/:colId/add', (req, res) => {
         });
         snapshot.forEach(doc => {
           let deckInfo = doc.data();
-          deckInformation = {
-            deckName: deckInfo.deckName,
-            deckLength: deckInfo.deckLength,
-            createdBy: deckInfo.createdBy,
-            exampleCard: deckInfo.exampleCard
-          };
+          deckInfo = { ...deckInfo, deckLength: deckArr.length };
+          deckInformation = deckInfo;
+          admin.db
+            .collection('Users')
+            .doc(id)
+            .collection('UserInformation')
+            .doc('Decks')
+            .collection(colId)
+            .doc('DeckInformation')
+            .update({ deckLength: deckArr.length })
+            .then(response => {
+              res.status(200).json({ deckInformation, data: deckArr });
+            });
         });
-        res.status(200).json({ deckInformation, data: deckArr });
       });
     });
   });
@@ -503,10 +497,9 @@ router.delete('/:id/:colId/delete-cards', (req, res) => {
         snapshot.forEach(doc => {
           let deckInfo = doc.data();
           deckInformation = {
-            deckName: deckInfo.deckName,
-            deckLength: deckInfo.deckLength,
-            createdBy: deckInfo.createdBy,
-            exampleCard: deckInfo.exampleCard
+            ...deckInfo,
+            deckLength: deckArr.length,
+            exampleCard: deckArr[0].front
           };
         });
         admin.db
@@ -518,9 +511,11 @@ router.delete('/:id/:colId/delete-cards', (req, res) => {
           .doc('DeckInformation')
           .update({
             deckLength: deckArr.length,
-            exampleCard: deckArr[0].front
+            exampleCard: deckArr[0].data.front
+          })
+          .then(response => {
+            res.status(200).json({ deckInformation, data: deckArr });
           });
-        res.status(200).json({ deckInformation, cards: deckArr });
       });
     });
   });
@@ -620,20 +615,21 @@ router.put('/update-deck-name/:id/:colId/', (req, res) => {
 
   let deckInformation;
 
-  Deck.updateDeckName(id, colId, changes).then(response => {
-    Deck.getDeckInfo(id, colId).then(snapshot => {
-      snapshot.forEach(doc => {
-        let deckInfo = doc.data();
-        deckInformation = {
-          deckName: deckInfo.deckName,
-          deckLength: deckInfo.deckLength,
-          createdBy: deckInfo.createdBy,
-          exampleCard: deckInfo.exampleCard
-        };
+  Deck.updateDeckName(id, colId, changes)
+    .then(response => {
+      Deck.getDeckInfo(id, colId).then(snapshot => {
+        snapshot.forEach(doc => {
+          let deckInfo = doc.data();
+          deckInformation = deckInfo;
+        });
+        res.status(200).json({ deckInformation });
       });
-      res.status(200).json({ deckInformation });
+    })
+    .catch(err => {
+      res
+        .status(500)
+        .json({ message: 'there was an error updating your deck name' });
     });
-  });
 });
 
 /**
@@ -693,12 +689,7 @@ router.put('/update/:id/:colId/', (req, res) => {
           });
           snapshot.forEach(doc => {
             let deckInfo = doc.data();
-            deckInformation = {
-              deckName: deckInfo.deckName,
-              deckLength: deckInfo.deckLength,
-              createdBy: deckInfo.createdBy,
-              exampleCard: deckInfo.exampleCard
-            };
+            deckInformation = deckInfo;
           });
           res.status(201).json({ deckInformation, data: deckArr });
         });
@@ -781,12 +772,7 @@ router.post('/archive/:id/:colId', (req, res) => {
         Deck.getDeckInfo(id, colId).then(snapshot => {
           snapshot.forEach(doc => {
             let deckInfo = doc.data();
-            deckInformation = {
-              deckName: colId,
-              deckLength: deckInfo.deckLength,
-              createdBy: deckInfo.createdBy,
-              exampleCard: deckInfo.exampleCard
-            };
+            deckInformation = deckInfo;
 
             Deck.archiveDeck(id, colId, deckArr).then(response => {
               admin.db
@@ -880,12 +866,7 @@ router.post('/remove-archive/:id/:colId', (req, res) => {
         Deck.getArchivedInfo(id, colId).then(snapshot => {
           snapshot.forEach(doc => {
             let deckInfo = doc.data();
-            deckInformation = {
-              deckName: colId,
-              deckLength: deckInfo.deckLength,
-              createdBy: deckInfo.createdBy,
-              exampleCard: deckInfo.exampleCard
-            };
+            deckInformation = deckInfo;
 
             Deck.postArchivedCards(id, colId, deckArr).then(response => {
               admin.db
