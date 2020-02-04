@@ -3,7 +3,7 @@ const admin = require('../config/firestore-config');
 const chai = require('chai');
 const assert = chai.assert;
 
-const { getAllDecks, getListOfDecks, getDeckById } = require('../models/demoDeckModel');
+const { getListOfDecks, getDeckById } = require('../models/demoDeckModel');
 const {addProfile, getUser, updateUser} = require('../models/usersModel')
 
 
@@ -17,24 +17,24 @@ const {addProfile, getUser, updateUser} = require('../models/usersModel')
 // });
 
 describe('demodeck models', () => {
-    it("gets all demo decks", async () => {
-        const demoDecks = admin.db.collection('DemoDeck').doc('I2r2gejFYwCQfqafWlVy')
-        await firebase.assertSucceeds(getAllDecks());
-    })
     it("gets the list of demo decknames", async () => {
         await admin.db.collection('DemoDeck').doc('I2r2gejFYwCQfqafWlVy').collection('Biology').doc('asdf').set({front: 'front'})
         await admin.db.collection('DemoDeck').doc('I2r2gejFYwCQfqafWlVy').collection('mNeme').doc('asdf').set({front: 'front'})
-        const list = await getListOfDecks('I2r2gejFYwCQfqafWlVy')
+        const list = await getListOfDecks('I2r2gejFYwCQfqafWlVy');
+        //check that list length is the same as the decks that were added
         assert.lengthOf(list, 2);
 
+        // check that the decks were retrieved with accurate information
         assert.equal(list[0]._queryOptions.collectionId, 'Biology')
         assert.equal(list[1]._queryOptions.collectionId, 'mNeme')
     })
     it("gets the deck by id", async () => {
-        // const db = authedApp(null);
-        admin.db.collection('DemoDeck').doc('I2r2gejFYwCQfqafWlVy').collection('Biology')
-        admin.db.collection('DemoDeck').doc('I2r2gejFYwCQfqafWlVy').collection('mNeme')
-        await firebase.assertSucceeds(getDeckById('I2r2gejFYwCQfqafWlVy', 'mNeme'))
+        await admin.db.collection('DemoDeck').doc('I2r2gejFYwCQfqafWlVy').collection('Biology').doc('asdf').set({front: 'front'});
+        await admin.db.collection('DemoDeck').doc('I2r2gejFYwCQfqafWlVy').collection('mNeme').doc('asdf').set({front: 'front'});
+        const deck = await getDeckById('I2r2gejFYwCQfqafWlVy', 'mNeme');
+        
+        // checks the colId to be sure that the correct deck was retrieved by ID
+        assert.equal(deck._query._queryOptions.collectionId, 'mNeme');
     })
 });
 
