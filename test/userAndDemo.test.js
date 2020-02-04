@@ -38,10 +38,14 @@ describe('demodeck models', () => {
     })
 });
 
-describe('user models', async () => {
+describe('user models', () => {
     it("adds a user profile given correct arguments", async () => {
-        // const db = authedApp(null);
-        await firebase.assertSucceeds(addProfile('25', {name: 'testUser'}))
+        let user;
+        await addProfile('25', {name: 'testUser'});
+        await getUser('25').then(res => user = res.data());
+        
+        // check that the name is accurate to the user that was retrieved
+        assert.equal(user.name, 'testUser');
     })
     it('gets a user by id', async () => {
         // const db = authedApp(null);
