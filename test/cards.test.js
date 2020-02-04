@@ -1,14 +1,12 @@
 // const firebase = require("@firebase/testing");
 const admin = require('../config/firestore-config');
-const uuidv4 = require('uuid/v4');
 
 const chai = require('chai');
-const expect = chai.expect;
+
 const assert = chai.assert;
-const should = require('chai').should();
 
 
-const fs = require("fs");
+
 const { 
     getDeckInfo,
     getCards,
@@ -29,20 +27,7 @@ const {
     getListOfArchivedDecks 
 } = require('../models/deckModel');
 
-// const projectId = "flashcards-test";
-
-// const coverageUrl = `http://localhost:8888/emulator/v1/projects/${projectId}:ruleCoverage.html`;
-
-// function authedApp(auth) {
-//     return firebase.initializeTestApp({ projectId, auth }).firestore();
-// };
-
-// beforeEach(async () => {
-//     // Clear the database between tests
-//     await firebase.clearFirestoreData({ projectId });
-// });
-
-describe('deck models', () => {
+describe('card models', () => {
     const cards = [{front: 'front', back: 'back'},
                     {front: 'front', back: 'back'},
                     {front: 'front', back: 'back'}]
@@ -139,7 +124,6 @@ describe('deck models', () => {
             //check updated cards for the changes
             const updatedCards = await getCards('user', 'deck')
             updatedCards.forEach(doc => {
-                console.log(doc.data().archived)
                 doc.data().archived === true ? lastArr.push(doc.data()) : null
             })
             // check that only the selected cards were updated
