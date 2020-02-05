@@ -1,30 +1,14 @@
-// const firebase = require("@firebase/testing");
 const admin = require('../config/firestore-config');
-
 const chai = require('chai');
-
 const assert = chai.assert;
-
 
 
 const { 
     getDeckInfo,
     getCards,
     postCards,
-    getListOfDecks,
     deleteCards,
-    deleteDeckInfo,
-    editCard,
-    getCard,
-    updateDeckName,
-    archiveDeck,
-    unArchiveDeck,
-    deleteArchivedInfo,
-    deleteArchivedCards,
-    getArchivedInfo,
-    getArchivedCards,
-    postArchivedCards,
-    getListOfArchivedDecks 
+    editCard
 } = require('../models/deckModel');
 
 describe('card models', () => {

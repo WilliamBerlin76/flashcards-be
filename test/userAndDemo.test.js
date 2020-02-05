@@ -1,4 +1,3 @@
-const firebase = require("@firebase/testing");
 const admin = require('../config/firestore-config');
 const chai = require('chai');
 const assert = chai.assert;
@@ -6,15 +5,6 @@ const assert = chai.assert;
 const { getListOfDecks, getDeckById } = require('../models/demoDeckModel');
 const {addProfile, getUser, updateUser} = require('../models/usersModel')
 
-
-// function authedApp(auth) {
-//     return firebase.initializeTestApp({ projectId, auth }).firestore();
-// }
-
-// beforeEach(async () => {
-// // Clear the database between tests
-// await firebase.clearFirestoreData({ projectId });
-// });
 
 describe('demodeck models', () => {
     it("gets the list of demo decknames", async () => {
@@ -39,7 +29,7 @@ describe('demodeck models', () => {
 });
 
 describe('user models', () => {
-    it("adds a user profile given correct arguments", async () => {
+    it("adds a user profile given correct data, and retrieves a correct user by their id", async () => {
         let user;
         await addProfile('25', {name: 'testUser'});
         await getUser('25').then(res => user = res.data());
@@ -47,12 +37,12 @@ describe('user models', () => {
         // check that the name is accurate to the user that was retrieved
         assert.equal(user.name, 'testUser');
     })
-    it('gets a user by id', async () => {
-        // const db = authedApp(null);
-        await firebase.assertSucceeds(getUser('2'))
-    })
     it('updates a users info', async () => {
-        // const db = authedApp(null);
-        await firebase.assertSucceeds(updateUser('25', {name: 'testing'}))
+        let user;
+        await addProfile('25', {name: 'testUser'});
+        await updateUser('25', {name: 'testUpdate'});
+        await getUser('25').then(res => user = res.data());
+        //check to see if update changed the selected user's name
+        assert.equal(user.name, 'testUpdate')
     })
 })
