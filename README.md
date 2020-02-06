@@ -22,14 +22,22 @@ The backend was built using:
 ### Dependencies
 
 ```javascript
+  "dependencies": {
     "@firebase/testing": "^0.16.3",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "firebase-admin": "^8.8.0",
     "helmet": "^3.21.2",
+    "jest": "^24.9.0",
     "swagger-jsdoc": "^3.5.0",
-    "swagger-ui-express": "^4.1.2"
+    "swagger-ui-express": "^4.1.2",
+    "uuid": "^3.4.0"
+  },
+  "devDependencies": {
+    "mocha": "^7.0.0",
+    "nodemon": "^2.0.2"
+  }
 ```
 
 ### Endpoint Documentation
