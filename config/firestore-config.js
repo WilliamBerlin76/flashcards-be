@@ -1,7 +1,6 @@
 const admin = require('firebase-admin');
-// const serviceAccount = require('../serviceAccountKey.json');
 
-// if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== 'test') {
 admin.initializeApp({
   credential: admin.credential.cert({
     type: process.env.SERVICE_TYPE,
@@ -17,11 +16,12 @@ admin.initializeApp({
     client_x509_cert_url: process.env.SERVICE_CLIENT_X509_CERT_URL
   })
 });
-// } else {
-//   admin.initializeApp({
-//     credential: admin.credential.cert(serviceAccount)
-//   });
-// }
+} else {
+  const serviceAccount = require('../serviceAccountKey.json');
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+  });
+}
 
 function verifyUser(req, res, next) {
   const token = req.headers.authentication;
