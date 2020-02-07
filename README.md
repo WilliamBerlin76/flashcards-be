@@ -1,3 +1,4 @@
+
 # mNeme Back End
 
 The deployed backend is on [Heroku](https://flashcards-be.herokuapp.com/).
@@ -62,3 +63,6 @@ There are some necessary environment variables for the server to run. These are 
 ```
 
 Once you have created a Firebase Application to connect to your locally run server you can assign each of the values from your personal Firebase App to these Environment Variables to connect the server to your Firestore.
+
+# template-web-backend
+run `firebase emulators:exec --only firestore 'npm test'` in the terminal to run the test files on the firestore emulator
