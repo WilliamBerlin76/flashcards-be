@@ -13,7 +13,7 @@ router.get('/:deckId', (req, res)=> {
         deckInformation = doc.data();
         return db.collection('PublicDecks')
             .doc(deckId)
-            .collection(deckData.info.deckName)
+            .collection(deckInformation.deckName)
             .get()
       } else {
           res.status(404).json({error: 'deck not found'})
