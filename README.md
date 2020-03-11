@@ -67,4 +67,4 @@ Once you have created a Firebase Application to connect to your locally run serv
 # template-web-backend
 run `firebase emulators:exec --only firestore 'npm test'` in the terminal to run the test files on the firestore emulator
 
-https://api.codeclimate.com/v1/badges/3a3bae56d35e95f06018/test_coverage
+({https://api.codeclimate.com/v1/badges/3a3bae56d35e95f06018/test_coverage})
