@@ -10,14 +10,16 @@ router.get('/:deckId', (req, res)=> {
   admin.db.doc(`/PublicDecks/${deckId}`).get()
     .then(doc => {
       if(doc.exists){
-        deckInformation = doc.data();
-        return db.collection('PublicDecks')
-            .doc(deckId)
-            .collection(deckInformation.deckName)
-            .get()
+        let collections = admin.db.collection('PublicDecks')
+            .doc(deckId).listCollections()
+        return collections
       } else {
-          res.status(404).json({error: 'deck not found'})
+        return  res.status(404).json({error: 'deck not found'})
       }
+    })
+    .then((collections)=>{
+      const collectionId = collections[0]._queryOptions.collectionId
+      return admin.db.collection('PublicDecks').doc(deckId).collection(collectionId).get()
     })
     .then(data=>{
       data.forEach(doc=>{
@@ -31,8 +33,10 @@ router.get('/:deckId', (req, res)=> {
     })
     .catch(err=>{
       console.error(err)
-      res.status(500).json({error: 'failed to get your public deck'})
+      return res.status(500).json({error: 'failed to get your public deck'})
     })
 
     
 })
+
+module.exports = router;

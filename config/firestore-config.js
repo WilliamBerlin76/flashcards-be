@@ -17,7 +17,7 @@ admin.initializeApp({
   })
 });
 } else {
-  const serviceAccount = require('../serviceAccountKey.json');
+  const serviceAccount = require('../ServiceAccountKey.json');
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
   });
