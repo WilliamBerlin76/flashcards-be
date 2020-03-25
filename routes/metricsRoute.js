@@ -44,6 +44,38 @@ router.get('/:id/:days', (req, res)=>{
     
 })
 
+/** 
+ * @swagger 
+ * 
+ * /api/metrics/:id/:days:
+ *   get: 
+ *     description: get metric date data for all dates within specified time frame
+ *     produces: 
+ *       - application/json
+ *     parameters: 
+ *       - name: id
+ *         description: userId
+ *         required: true
+ *         type: string
+ *       - name: days
+ *         decription: number of days of data
+ *         required: true
+ *         type: string
+ *     responses:
+ *        '200':
+ *         description: Array of objects that includes a date in milliseconds and an object of metrics data
+ *        '500': 
+ *         description: failed to get metrics
+ *              
+ * 
+ *          
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+
 router.post('/:id', (req, res)=>{
     const {id} = req.params;
     Data.addMetrics(id, dateId, req.body)
@@ -56,6 +88,33 @@ router.post('/:id', (req, res)=>{
         })
 
 })
+
+/** 
+ * @swagger 
+ * 
+ * /api/metrics/:id:
+ *    post: 
+ *       description: posts metric data to current date
+ *       produces: 
+ *         - application/json
+ *       parameters: 
+ *         - name: id
+ *           description: userId
+ *           required: true
+ *           type: string
+ *         - name: metrics
+ *           description: object
+ *           required: true
+ *           type: object
+ * 
+ *       responses:
+ *          '201':
+ *            description: Confirmation of added stats
+ *          '500': 
+ *            description: failed to add stats 
+ * 
+ * 
+ */
 
 router.put('/:id', (req, res)=>{
     const {id} = req.params;
@@ -89,6 +148,32 @@ router.put('/:id', (req, res)=>{
         })
 
 })
+/** 
+ * @swagger 
+ * 
+ * /api/metrics/:id:
+ *   put: 
+ *     description: updates metric data to current date
+ *     produces: 
+ *       -application/json
+ *     parameters: 
+ *       - name: id
+ *         description: userId
+ *         required: true
+ *         type: string
+ *       - name: metrics
+ *         description: object
+ *         required: true
+ *         type: object
+ *     responses:
+ *       '201':
+ *         description: Confirmation of added stats
+ *       '500': 
+ *         description: failed to update stats 
+ * 
+ * 
+ */
+
 
 
 module.exports = router
