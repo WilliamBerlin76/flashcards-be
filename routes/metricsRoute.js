@@ -2,10 +2,9 @@ const router = require('express').Router();
 const admin = require('../config/firestore-config');
 const Data = require('../models/metricsModel')
 
-//TODO: set to UTC to make it more universal
+
+
 const dateId = new Date().setHours(12,0,0,0)
-console.log("today:",dateId)
-console.log("yesterday",dateId - (24*60*60*1000))
 
 //gets that current days metrics
 router.get('/:id/:days', (req, res)=>{
@@ -18,30 +17,31 @@ router.get('/:id/:days', (req, res)=>{
         dates.push(newDate)
         newDate = newDate - (24*60*60*1000)
     }
-    console.log('dates array', dates)
-    const metricsData = async ()=>{
-        await dates.forEach(date => {
-            console.log('Date:', date)
-            Data.getMetrics(userId, date)
-            .then(doc => {
-                const metrics = doc.data();
-                metricsArray.push({date, metrics})
-                console.log("METRICS IN THEN",metricsArray)
-            })
-            .catch(err=>{
-                console.error(err)
-                res.status(500).json({message: 'failed to get your metrics'})
-            })
+    dates.forEach((date, index) => {
+        Data.getMetrics(userId, date)
+        .then(doc => {
+            const metrics = doc.data();
+            metricsArray.push({date, metrics})
+            if (metricsArray.length === dates.length) {
+                const sendMetrics =metricsArray.filter(val =>{
+                    if(val.metrics){
+                        return val
+                    } else {
+                        return null
+                    }
+                })
+                return res.status(200).json(sendMetrics)
+            } else {
+                null
+            }
         })
-        console.log('after the await', metricsArray)
-        return res.status(200).json({metricsArray})
+        .catch(err=>{
+            console.error(err)
+            res.status(500).json({message: 'failed to get your metrics'})
+        })
+    }) //end for loop
+  
     
-    }
-
-    return metricsData()
-    
-    
-
 })
 
 router.post('/:id', (req, res)=>{
