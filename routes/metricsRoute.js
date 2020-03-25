@@ -4,21 +4,43 @@ const Data = require('../models/metricsModel')
 
 //TODO: set to UTC to make it more universal
 const dateId = new Date().setHours(12,0,0,0)
+console.log("today:",dateId)
+console.log("yesterday",dateId - (24*60*60*1000))
 
 //gets that current days metrics
-router.get('/:id', (req, res)=>{
-    const userId = req.params.id
+router.get('/:id/:days', (req, res)=>{
+    const userId = req.params.id;
+    const days = parseInt(req.params.days)
+    let metricsArray = []
+    let dates = []
+    let newDate = dateId;
+    for(let i = 0; i < days; i++){
+        dates.push(newDate)
+        newDate = newDate - (24*60*60*1000)
+    }
+    console.log('dates array', dates)
+    const metricsData = async ()=>{
+        await dates.forEach(date => {
+            console.log('Date:', date)
+            Data.getMetrics(userId, date)
+            .then(doc => {
+                const metrics = doc.data();
+                metricsArray.push({date, metrics})
+                console.log("METRICS IN THEN",metricsArray)
+            })
+            .catch(err=>{
+                console.error(err)
+                res.status(500).json({message: 'failed to get your metrics'})
+            })
+        })
+        console.log('after the await', metricsArray)
+        return res.status(200).json({metricsArray})
     
-    Data.getMetrics(userId, dateId)
-    .then(doc => {
-        const metrics = doc.data();
-        console.log(metrics)
-        res.status(200).json(metrics)
-    })
-    .catch(err=>{
-        console.error(err)
-        res.status(500).json({message: 'failed to get your metrics'})
-    })
+    }
+
+    return metricsData()
+    
+    
 
 })
 
