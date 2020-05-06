@@ -1,7 +1,7 @@
 
 # mNeme Back End
 
-The deployed backend is on [Heroku](https://flashcards-be.herokuapp.com/).
+The deployed backend is on [Heroku](https://mneme-cards.herokuapp.com/).
 
 ### Getting Started
 
@@ -43,7 +43,7 @@ The backend was built using:
 
 ### Endpoint Documentation
 
-All endpoint documentation was done using Swagger and can be found [here](https://flashcards-be.herokuapp.com/api-docs/).
+All endpoint documentation was done using Swagger and can be found [here](https://mneme-cards.herokuapp.com/api-docs/).
 
 ### Environment Variables
 
